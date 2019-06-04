@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 import sys
 
-import PTVA_LI.source_estimation as se
+import PTVA_LI_2.source_estimation as se
 import operator
 
 from multiprocessing import Pool
