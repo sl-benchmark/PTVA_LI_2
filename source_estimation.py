@@ -34,9 +34,8 @@ def ml_estimate(graph, obs_time, sigma, mu, paths, path_lengths,
     - dictionary: node -> a posteriori likelihood
 
     """
-    ### Gets the sorted observers and the referential observer (closest one)
-    sorted_obs = sorted(obs_time.items(), key=operator.itemgetter(1))
-    sorted_obs = [x[0] for x in sorted_obs]
+    ### Gets the observers and the referential observer (closest one)
+    obs = list(obs_time.keys())
     o1 = min(obs_time, key=obs_time.get)
 
     ### Gets the nodes of the graph and initializes likelihood
@@ -48,7 +47,7 @@ def ml_estimate(graph, obs_time, sigma, mu, paths, path_lengths,
     covariance = collections.defaultdict(list)
 
     ### Computes classes of nodes with same position with respect to all observers
-    classes = tl.classes(path_lengths, sorted_obs)
+    classes = tl.classes(path_lengths, obs)
 
     ### Iteration over all nodes per class
     #   nodes from same class will be attributed the average of their likelihoods
@@ -59,15 +58,15 @@ def ml_estimate(graph, obs_time, sigma, mu, paths, path_lengths,
         for s in c:
             if path_lengths[o1][s] < max_dist:
                 ### BFS tree
-                tree_s = likelihood_tree(paths, s, sorted_obs)
+                tree_s = likelihood_tree(paths, s, obs)
                 ### Covariance matrix
-                cov_d_s = tl.cov_mat(tree_s, graph, paths, sorted_obs)
+                cov_d_s = tl.cov_mat(tree_s, graph, paths, obs)
                 cov_d_s = (sigma**2)*cov_d_s
                 ### Mean vector
-                mu_s = tl.mu_vector_s(paths, s, sorted_obs)
+                mu_s = tl.mu_vector_s(paths, s, obs)
                 mu_s = mu*mu_s
                 ### Computes log-probability of the source being the real source
-                likelihood, tmp = logLH_source_tree(mu_s, cov_d_s, sorted_obs, obs_time)
+                likelihood, tmp = logLH_source_tree(mu_s, cov_d_s, obs, obs_time)
                 tmp_lkl.append(likelihood)
 
                 ## Save print values
